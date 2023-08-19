@@ -1,19 +1,17 @@
 #include <Arduino.h>
 #include "./steppers/steppers.h"
 
-#define DIR     14
-#define STEP    12
+
+Stepper stepper0(12, 14, 27, 26, 25, 0, 0, 0);
 
 
 void setup() {
-    pinMode(DIR, OUTPUT);
-    pinMode(STEP, OUTPUT);
-    digitalWrite(DIR, LOW);
+    stepper0.set_step_mode(Sixteenth);
 }
 
 void loop() {
-    digitalWrite(STEP, LOW);
+    digitalWrite(12, LOW);
     delayMicroseconds(1000);
-    digitalWrite(STEP, HIGH);
+    digitalWrite(12, HIGH);
     delayMicroseconds(1000);
 }
