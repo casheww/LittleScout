@@ -18,6 +18,10 @@ hw_timer_t *timer = NULL;
 void ARDUINO_ISR_ATTR on_timer();
 
 
+uint64_t i = 0;
+uint64_t u;
+uint64_t last_debug = 2;
+
 void setup() {
     Serial.begin(9600);
 
@@ -35,6 +39,8 @@ void setup() {
     Serial.println("timer init...");
     double timer_resolution_s = 1e-6;       // 1e-6 means 1 us resolution
     uint16_t timer_divider = APB_CLK_FREQ * timer_resolution_s;
+    Serial.print("timer divider: ");
+    Serial.println(timer_divider);
     timer = timerBegin(3, timer_divider, true);
     if (timer == NULL) {
         Serial.println("timer setup failed - timer is NULL");
@@ -42,17 +48,21 @@ void setup() {
     timerAttachInterrupt(timer, &on_timer, false);
     Serial.println("done");
 
-    ra_stepper->set_rpm(5);
+    ra_stepper->set_rpm(6);
     timerAlarmWrite(timer, 100, false);
     timerAlarmEnable(timer);
     ra_stepper->set_dir(LOW);
+
+    u = micros();
 }
 
-uint64_t i;
-
 void loop() {
-    Serial.println(i);
-    delay(500);
+    if (i % 50 == 0 && i != last_debug) {
+        uint64_t _u = micros();
+        Serial.println(_u - u);
+        u = _u;
+        last_debug = i;
+    }
 }
 
 
@@ -69,7 +79,6 @@ void ARDUINO_ISR_ATTR on_timer() {
             next = (Axis) i;
         }
     }
-
 
     // setup next interrupt
     timerAlarmWrite(timer, min_time, false);

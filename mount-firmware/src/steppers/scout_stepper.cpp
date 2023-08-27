@@ -65,11 +65,10 @@ void ScoutStepper::set_rpm(double rpm) {
     }
 
     double rev_hz = rpm / 60.0;
-    Serial.println(rev_hz);
-    Serial.println(get_pulses_per_rev());
     double step_hz = rev_hz * get_pulses_per_rev();
     step_period_us = 1e6 / step_hz;
-    Serial.println(step_period_us);
+
+    next_step_us = micros() + step_period_us;
 }
 
 double ScoutStepper::get_rpm(void) {
@@ -91,16 +90,12 @@ uint8_t ScoutStepper::get_dir(void) {
     return dir & HIGH;
 }
 
-uint64_t ScoutStepper::get_last_step_micros(void) {
-    return last_step_micros;
-}
-
 uint64_t ScoutStepper::get_step_period_us(void) {
     return step_period_us;
 }
 
 uint64_t ScoutStepper::get_next_step_time(void) {
-    return last_step_micros + step_period_us;
+    return next_step_us;
 }
 
 bool ScoutStepper::is_stopped(void) {
@@ -109,8 +104,7 @@ bool ScoutStepper::is_stopped(void) {
 
 
 void ScoutStepper::step(void) {
-    last_step_micros = micros();
-
+    next_step_us += step_period_us;
     digitalWrite(pins.step_pin, HIGH);
     delayMicroseconds(1);
     digitalWrite(pins.step_pin, LOW);

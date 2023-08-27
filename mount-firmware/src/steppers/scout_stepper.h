@@ -39,7 +39,6 @@ public:
     double get_rpm(void);
     void set_dir(uint8_t val);
     uint8_t get_dir(void);
-    uint64_t get_last_step_micros(void);
     uint64_t get_step_period_us(void);
     uint64_t get_next_step_time(void);
     bool is_stopped(void);
@@ -50,7 +49,7 @@ protected:
 private:
     MicrostepMode microstep_mode;
     uint64_t step_period_us;
-    uint64_t last_step_micros;
+    uint64_t next_step_us;
     uint8_t dir;
 };
 
